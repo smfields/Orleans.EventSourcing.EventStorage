@@ -1,8 +1,30 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B2E94C00-7746-49D0-89E1-033613798D07}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{67A0FE1A-B369-4EC1-B245-7C904E6A78F5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orleans.EventSourcing.EventStorage", "src\Orleans.EventSourcing.EventStorage\Orleans.EventSourcing.EventStorage.csproj", "{D44E30A2-8717-42F0-841C-B17F53739ACB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orleans.EventSourcing.EventStorage.Tests", "test\Orleans.EventSourcing.EventStorage.Tests\Orleans.EventSourcing.EventStorage.Tests.csproj", "{304FA6A6-6867-440A-92FC-1622A31A5006}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D44E30A2-8717-42F0-841C-B17F53739ACB} = {B2E94C00-7746-49D0-89E1-033613798D07}
+		{304FA6A6-6867-440A-92FC-1622A31A5006} = {67A0FE1A-B369-4EC1-B245-7C904E6A78F5}
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D44E30A2-8717-42F0-841C-B17F53739ACB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D44E30A2-8717-42F0-841C-B17F53739ACB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D44E30A2-8717-42F0-841C-B17F53739ACB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D44E30A2-8717-42F0-841C-B17F53739ACB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{304FA6A6-6867-440A-92FC-1622A31A5006}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{304FA6A6-6867-440A-92FC-1622A31A5006}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{304FA6A6-6867-440A-92FC-1622A31A5006}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{304FA6A6-6867-440A-92FC-1622A31A5006}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
