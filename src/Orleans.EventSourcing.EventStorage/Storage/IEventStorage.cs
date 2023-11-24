@@ -8,7 +8,7 @@ namespace Orleans.EventSourcing.EventStorage;
 public interface IEventStorage
 {
     /// <summary>
-    /// Read events from event stream.
+    /// Read events from an event stream.
     /// </summary>
     /// <param name="grainId">ID of the grain to which the events belong</param>
     /// <param name="version">The version to start reading from</param>
@@ -22,14 +22,14 @@ public interface IEventStorage
     ) where TEvent : class;
 
     /// <summary>
-    /// Append events to event stream.
+    /// Append events to an event stream.
     /// </summary>
     /// <param name="grainId">ID of the grain to which the events belong</param>
     /// <param name="events">Enumerable of events to append to the stream</param>
     /// <param name="expectedVersion">The expected current version of the stream</param>
     /// <typeparam name="TEvent">The grain event type</typeparam>
-    /// <returns>Completion promise for the append operation</returns>
-    Task AppendEventsToStorage<TEvent>(
+    /// <returns>Completion promise that returns true if the events were appended successfully, or false otherwise</returns>
+    Task<bool> AppendEventsToStorage<TEvent>(
         GrainId grainId,
         IEnumerable<TEvent> events,
         int expectedVersion

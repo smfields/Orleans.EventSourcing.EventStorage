@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <Authors>Sam Fields</Authors>
@@ -10,18 +9,16 @@
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <DebugType>embedded</DebugType>
         <DebugSymbols>true</DebugSymbols>
+        <TargetFrameworks>net8.0;net7.0</TargetFrameworks>
     </PropertyGroup>
-    
+
     <ItemGroup>
-        <None Include="../../README.md" Pack="true" PackagePath="\" />
+        <None Include="../../README.md" Pack="true" PackagePath="\"/>
+        <None Remove="Orleans.EventSourcing.EventStorage.csproj.DotSettings"/>
     </ItemGroup>
-    
+
     <ItemGroup>
-      <Folder Include="Hosting\" />
-    </ItemGroup>
-    
-    <ItemGroup>
-      <PackageReference Include="Microsoft.Orleans.EventSourcing" Version="7.2.3" />
+        <PackageReference Include="Microsoft.Orleans.EventSourcing" Version="7.2.3"/>
     </ItemGroup>
 
 </Project>
