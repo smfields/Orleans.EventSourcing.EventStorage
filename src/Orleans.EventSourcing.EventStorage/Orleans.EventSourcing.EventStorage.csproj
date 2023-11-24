@@ -7,6 +7,11 @@
         <Authors>Sam Fields</Authors>
         <PackageProjectUrl>https://github.com/smfields/Orleans.EventSourcing.EventStorage</PackageProjectUrl>
         <RepositoryUrl>https://github.com/smfields/Orleans.EventSourcing.EventStorage</RepositoryUrl>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
+    
+    <ItemGroup>
+        <None Include="../../README.md" Pack="true" PackagePath="\" />
+    </ItemGroup>
 
 </Project>
