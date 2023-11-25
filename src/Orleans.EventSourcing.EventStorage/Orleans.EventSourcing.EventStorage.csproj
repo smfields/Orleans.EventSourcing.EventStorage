@@ -9,7 +9,7 @@
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <DebugType>embedded</DebugType>
         <DebugSymbols>true</DebugSymbols>
-        <TargetFrameworks>net8.0;net7.0</TargetFrameworks>
+        <TargetFramework>net7.0</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>

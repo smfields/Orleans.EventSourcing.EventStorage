@@ -29,8 +29,8 @@ public static class EventStorageHelpers
     {
         var grainTypeName = grainType.FullName;
         var errMsg = string.IsNullOrEmpty(name)
-            ? $"No default storage provider found loading grain type {grainTypeName}."
-            : $"No storage provider named \"{name}\" found loading grain type {grainTypeName}.";
+            ? $"No default event storage provider found loading grain type {grainTypeName}."
+            : $"No event storage provider named \"{name}\" found loading grain type {grainTypeName}.";
         throw new BadEventStorageProviderConfigException(errMsg);
     }
 }

@@ -17,7 +17,7 @@ public static class EventStorageSiloBuilderExtensions
 
     public static ISiloBuilder AddEventStorageBasedLogConsistencyProvider(
         this ISiloBuilder builder,
-        string name = "EventStream"
+        string name = "EventStorage"
     )
     {
         return builder.ConfigureServices(
