@@ -1,4 +1,4 @@
-﻿namespace Orleans.EventSourcing.EventStorage.Tests.TestGrains;
+﻿namespace Orleans.EventSourcing.EventStorage.Testing.TestGrains.CounterGrain;
 
 public interface ICounterEvent;
 
@@ -9,4 +9,4 @@ public record CounterIncrementedEvent(uint Amount) : ICounterEvent;
 public record CounterDecrementedEvent(uint Amount) : ICounterEvent;
 
 [Serializable, GenerateSerializer]
-public class CounterResetEvent : ICounterEvent;
+public record CounterResetEvent(int ResetValue) : ICounterEvent;

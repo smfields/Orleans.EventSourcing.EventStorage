@@ -83,11 +83,11 @@ public static class MemoryEventStorageSiloBuilderExtensions
             if (string.Equals(name, defaultProviderName, StringComparison.Ordinal))
             {
                 services.TryAddSingleton(
-                    sp => sp.GetServiceByName<IEventStorage>(defaultProviderName)
+                    sp => sp.GetRequiredKeyedService<IEventStorage>(defaultProviderName)
                 );
             }
 
-            services.AddSingletonNamedService(name, MemoryEventStorageFactory.Create);
+            services.AddKeyedSingleton(name, MemoryEventStorageFactory.Create);
         });
     }
 }

@@ -9,7 +9,7 @@
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <DebugType>embedded</DebugType>
         <DebugSymbols>true</DebugSymbols>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>
@@ -18,7 +18,31 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0"/>
         <PackageReference Include="Microsoft.Orleans.EventSourcing" Version="7.2.3"/>
+    </ItemGroup>
+
+    <!-- Testing Specific configuiration goes here -->
+    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+        <IsTestProject>true</IsTestProject>
+    </PropertyGroup>
+
+    <!-- Testing Specific files go here -->
+    <ItemGroup Condition="'$(Configuration)' == 'Release'">
+        <Compile Remove="**\*.Tests.cs"/>
+        <Compile Remove="**\Testing\*"/>
+    </ItemGroup>
+
+    <!-- Testing Specific Dependencies go here -->
+    <ItemGroup Condition="'$(Configuration)' != 'Release'">
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2"/>
+        <PackageReference Include="Microsoft.Orleans.TestingHost" Version="7.2.3"/>
+        <PackageReference Include="NUnit" Version="3.13.3"/>
+        <PackageReference Include="NUnit3TestAdapter" Version="4.2.1"/>
+        <PackageReference Include="NUnit.Analyzers" Version="3.6.1"/>
+        <PackageReference Include="coverlet.collector" Version="6.0.0"/>
+        <PackageReference Include="Moq" Version="4.18.4"/>
+        <PackageReference Include="Moq.AutoMock" Version="3.5.0"/>
     </ItemGroup>
 
 </Project>

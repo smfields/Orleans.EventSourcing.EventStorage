@@ -9,8 +9,10 @@ namespace Orleans.EventSourcing.EventStorage.Memory;
 /// </summary>
 public static class MemoryEventStorageFactory
 {
-    public static IEventStorage Create(IServiceProvider services, string name)
+    public static IEventStorage Create(IServiceProvider services, object? key)
     {
+        var name = (string)key!;
+
         return ActivatorUtilities.CreateInstance<MemoryEventStorage>(
             services,
             services.GetRequiredService<IOptionsMonitor<MemoryEventStorageOptions>>().Get(name),

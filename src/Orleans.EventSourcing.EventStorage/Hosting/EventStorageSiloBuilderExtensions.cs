@@ -12,12 +12,14 @@ public static class EventStorageSiloBuilderExtensions
 {
     public static ISiloBuilder AddEventStorageBasedLogConsistencyProviderAsDefault(this ISiloBuilder builder)
     {
-        return builder.AddEventStorageBasedLogConsistencyProvider("Default");
+        return builder.AddEventStorageBasedLogConsistencyProvider(
+            ProviderConstants.DEFAULT_LOG_CONSISTENCY_PROVIDER_NAME
+        );
     }
 
     public static ISiloBuilder AddEventStorageBasedLogConsistencyProvider(
         this ISiloBuilder builder,
-        string name = "EventStorage"
+        string name
     )
     {
         return builder.ConfigureServices(
@@ -34,7 +36,9 @@ public static class EventStorageSiloBuilderExtensions
         services.TryAddSingleton<ILogViewAdaptorFactory>(sp =>
             sp.GetServiceByName<ILogViewAdaptorFactory>(ProviderConstants.DEFAULT_LOG_CONSISTENCY_PROVIDER_NAME)
         );
-        return services.AddSingletonNamedService<ILogViewAdaptorFactory, LogConsistencyProvider>(name);
+        return services
+            .AddKeyedSingleton<ILogViewAdaptorFactory, LogConsistencyProvider>(name) // .NET 8 Built-in keyed services
+            .AddSingletonNamedService<ILogViewAdaptorFactory, LogConsistencyProvider>(name); // Orleans keyed services
     }
 
     private static void AddProtocolServices(this IServiceCollection services)

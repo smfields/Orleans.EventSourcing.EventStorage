@@ -1,6 +1,4 @@
-﻿using Orleans.EventSourcing.EventStorage.Tests.TestGrains;
-
-namespace Orleans.EventSourcing.EventStorage.Tests;
+﻿namespace Orleans.EventSourcing.EventStorage.Testing.TestGrains.CounterGrain;
 
 public class CounterGrainState
 {
@@ -8,7 +6,7 @@ public class CounterGrainState
 
     public void Apply(CounterResetEvent resetEvent)
     {
-        Value = 0;
+        Value = resetEvent.ResetValue;
     }
 
     public void Apply(CounterIncrementedEvent incrementEvent)
@@ -24,7 +22,8 @@ public class CounterGrainState
 
 public interface ICounterGrain : IGrainWithGuidKey
 {
-    public ValueTask Reset();
+    public ValueTask Reset(int newValue = 0);
+    public ValueTask<int> GetCurrentValue();
     public ValueTask Increment(uint amount);
     public ValueTask Decrement(uint amount);
     public ValueTask ConfirmEvents();
@@ -32,10 +31,15 @@ public interface ICounterGrain : IGrainWithGuidKey
 
 public class CounterGrain : JournaledGrain<CounterGrainState, ICounterEvent>, ICounterGrain
 {
-    public ValueTask Reset()
+    public ValueTask Reset(int newValue = 0)
     {
-        RaiseEvent(new CounterResetEvent());
+        RaiseEvent(new CounterResetEvent(newValue));
         return ValueTask.CompletedTask;
+    }
+
+    public ValueTask<int> GetCurrentValue()
+    {
+        return ValueTask.FromResult(State.Value);
     }
 
     public ValueTask Increment(uint amount)
@@ -67,11 +71,33 @@ public class CounterGrain : JournaledGrain<CounterGrainState, ICounterEvent>, IC
 
     private bool WillOverflow(uint amount)
     {
-        return int.MaxValue - State.Value >= amount;
+        try
+        {
+            checked
+            {
+                var newValue = State.Value + (int)amount;
+                return false;
+            }
+        }
+        catch (Exception e)
+        {
+            return true;
+        }
     }
 
     private bool WillUnderflow(uint amount)
     {
-        return int.MinValue + amount < State.Value;
+        try
+        {
+            checked
+            {
+                var newValue = State.Value - (int)amount;
+                return false;
+            }
+        }
+        catch (Exception e)
+        {
+            return true;
+        }
     }
 }
