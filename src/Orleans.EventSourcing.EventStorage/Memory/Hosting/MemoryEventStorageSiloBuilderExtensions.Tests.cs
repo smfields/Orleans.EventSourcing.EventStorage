@@ -34,7 +34,7 @@ public class MemoryEventStorageSiloBuilderExtensionsTests
     public void Memory_storage_can_be_registered_by_name()
     {
         var silo = Cluster.Primary as InProcessSiloHandle;
-        var eventStorage = silo!.SiloHost.Services.GetRequiredServiceByName<IEventStorage>("MemoryEventStorage");
+        var eventStorage = silo!.SiloHost.Services.GetRequiredKeyedService<IEventStorage>("MemoryEventStorage");
         Assert.That(eventStorage, Is.TypeOf<MemoryEventStorage>());
     }
 

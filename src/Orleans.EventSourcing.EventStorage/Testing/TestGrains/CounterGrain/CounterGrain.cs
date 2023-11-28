@@ -2,7 +2,7 @@
 
 public class CounterGrainState
 {
-    public int Value { get; private set; } = 0;
+    public int Value { get; private set; }
 
     public void Apply(CounterResetEvent resetEvent)
     {
@@ -75,11 +75,11 @@ public class CounterGrain : JournaledGrain<CounterGrainState, ICounterEvent>, IC
         {
             checked
             {
-                var newValue = State.Value + (int)amount;
+                _ = State.Value + (int)amount;
                 return false;
             }
         }
-        catch (Exception e)
+        catch (Exception)
         {
             return true;
         }
@@ -91,11 +91,11 @@ public class CounterGrain : JournaledGrain<CounterGrainState, ICounterEvent>, IC
         {
             checked
             {
-                var newValue = State.Value - (int)amount;
+                _ = State.Value - (int)amount;
                 return false;
             }
         }
-        catch (Exception e)
+        catch (Exception)
         {
             return true;
         }
