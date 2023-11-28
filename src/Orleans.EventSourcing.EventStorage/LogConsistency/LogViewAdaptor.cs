@@ -179,7 +179,7 @@ internal class LogViewAdaptor<TLogView, TLogEntry> :
     private static Exception UnwrapTransportException(Exception exception)
     {
         if (exception is ProtocolTransportException { InnerException: not null } transportException)
-            exception = transportException.InnerException;
+            exception = transportException.InnerException!;
 
         return exception;
     }
