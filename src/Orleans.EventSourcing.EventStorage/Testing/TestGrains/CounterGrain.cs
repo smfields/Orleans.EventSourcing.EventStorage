@@ -1,4 +1,4 @@
-﻿namespace Orleans.EventSourcing.EventStorage.Testing.TestGrains.CounterGrain;
+﻿namespace Orleans.EventSourcing.EventStorage.Testing.TestGrains;
 
 public class CounterGrainState
 {
@@ -27,6 +27,7 @@ public interface ICounterGrain : IGrainWithGuidKey
     public ValueTask Increment(uint amount);
     public ValueTask Decrement(uint amount);
     public ValueTask ConfirmEvents();
+    public ValueTask Deactivate();
 }
 
 public class CounterGrain : JournaledGrain<CounterGrainState, ICounterEvent>, ICounterGrain
@@ -67,6 +68,12 @@ public class CounterGrain : JournaledGrain<CounterGrainState, ICounterEvent>, IC
     async ValueTask ICounterGrain.ConfirmEvents()
     {
         await ConfirmEvents();
+    }
+
+    public ValueTask Deactivate()
+    {
+        DeactivateOnIdle();
+        return ValueTask.CompletedTask;
     }
 
     private bool WillOverflow(uint amount)

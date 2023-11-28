@@ -37,7 +37,7 @@ public interface IMemoryEventStorageGrain : IGrainWithIntegerKey
 internal class MemoryEventStorageGrain : IMemoryEventStorageGrain
 {
     private readonly ILogger<MemoryEventStorageGrain> _logger;
-    private readonly Dictionary<GrainId, List<object>> _store = new();
+    private readonly Dictionary<GrainId, dynamic> _store = new();
 
     public MemoryEventStorageGrain(ILogger<MemoryEventStorageGrain> logger)
     {
@@ -84,7 +84,7 @@ internal class MemoryEventStorageGrain : IMemoryEventStorageGrain
 
         if (!_store.TryGetValue(grainId, out var entries))
         {
-            entries = new List<object>();
+            entries = new List<TEvent>();
             _store[grainId] = entries;
         }
 

@@ -61,4 +61,13 @@ public class EventStorageHelpersTests
 
         Assert.That(eventStorage, Is.Not.Null);
     }
+
+    [Test]
+    public void GetEventStorage_throws_an_exception_if_no_matching_provider_can_be_found()
+    {
+        var serviceProvider = new ServiceCollection().BuildServiceProvider();
+        Assert.Throws<BadEventStorageProviderConfigException>(
+            () => EventStorageHelpers.GetEventStorage(typeof(NoAttributeClass), serviceProvider)
+        );
+    }
 }

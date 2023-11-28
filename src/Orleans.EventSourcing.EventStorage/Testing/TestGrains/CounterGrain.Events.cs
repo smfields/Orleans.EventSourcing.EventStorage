@@ -1,4 +1,4 @@
-﻿namespace Orleans.EventSourcing.EventStorage.Testing.TestGrains.CounterGrain;
+﻿namespace Orleans.EventSourcing.EventStorage.Testing.TestGrains;
 
 public interface ICounterEvent;
 

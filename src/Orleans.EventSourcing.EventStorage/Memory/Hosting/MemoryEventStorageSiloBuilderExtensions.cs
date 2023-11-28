@@ -4,7 +4,6 @@ using Microsoft.Extensions.Options;
 using Orleans.Configuration;
 using Orleans.EventSourcing.EventStorage;
 using Orleans.EventSourcing.EventStorage.Memory;
-using Orleans.Runtime;
 
 // ReSharper disable once CheckNamespace
 namespace Orleans.Hosting;

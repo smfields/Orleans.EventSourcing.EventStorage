@@ -1,9 +1,8 @@
-﻿using Orleans.EventSourcing.EventStorage.Testing.TestGrains.CounterGrain;
-using Orleans.TestingHost;
+﻿using Orleans.TestingHost;
 
-namespace Orleans.EventSourcing.EventStorage.Testing;
+namespace Orleans.EventSourcing.EventStorage.Testing.TestGrains;
 
-public class CounterFunctionalTests
+public class CounterGrainTests
 {
     private TestCluster Cluster { get; set; } = null!;
     private IGrainFactory GrainFactory => Cluster.GrainFactory;
