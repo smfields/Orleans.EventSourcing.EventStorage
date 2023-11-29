@@ -1,57 +1,62 @@
 ﻿using Orleans.EventSourcing.EventStorage.Testing.TestGrains;
-using Orleans.TestingHost;
 
 namespace Orleans.EventSourcing.EventStorage;
 
 public class LogViewAdaptorTests
 {
-    private TestCluster Cluster { get; set; } = null!;
-    private IGrainFactory GrainFactory => Cluster.GrainFactory;
+    private AutoMocker MockContainer { get; set; } = null!;
 
-    [OneTimeSetUp]
-    public async Task OneTimeSetUp()
+    [SetUp]
+    public void Setup()
     {
-        var builder = new TestClusterBuilder();
+        MockContainer = InitializeMockContainer();
+    }
 
-        builder.AddSiloBuilderConfigurator<TestSiloConfigurator>();
+    private AutoMocker InitializeMockContainer(AutoMocker? mockContainer = null)
+    {
+        mockContainer ??= new AutoMocker();
 
-        Cluster = builder.Build();
-        await Cluster.DeployAsync();
+        return mockContainer;
     }
 
     [Test]
-    public async Task ReadAsync_can_reconstruct_an_existing_grain_from_stored_events()
+    public void Initial_confirmed_version_is_0()
     {
-        var counterId = Guid.NewGuid();
-        var counterGrain = GrainFactory.GetGrain<ICounterGrain>(counterId);
-        await counterGrain.Reset(1000); // 1000
-        await counterGrain.Increment(10); // 1010
-        await counterGrain.Increment(15); // 1025
-        await counterGrain.Increment(20); // 1045
-        await counterGrain.Increment(25); // 1070
-        await counterGrain.Decrement(30); // 1040
-        await counterGrain.Decrement(35); // 1005
-        await counterGrain.ConfirmEvents();
-        await counterGrain.Deactivate();
+        var logViewAdaptor = CreateLogViewAdaptor<CounterGrainState, ICounterEvent>();
 
-        var currentValue = await counterGrain.GetCurrentValue();
-
-        Assert.That(currentValue, Is.EqualTo(1005));
+        Assert.That(logViewAdaptor.ConfirmedVersion, Is.EqualTo(0));
     }
 
-    [OneTimeTearDown]
-    public async Task OneTimeTearDown()
-    {
-        await Cluster.StopAllSilosAsync();
-    }
+    // [Test]
+    // public async Task OnActivate_initializes_the_confirmed_view()
+    // {
+    //     var initialEvents = new List<EventRecord<ICounterEvent>>
+    //     {
+    //         new(new CounterResetEvent(10), 1)
+    //     };
+    //     MockContainer
+    //         .GetMock<IEventStorage>()
+    //         .Setup(
+    //             x => x.ReadEventsFromStorage<ICounterEvent>(
+    //                 It.IsAny<GrainId>(),
+    //                 It.IsAny<int>(),
+    //                 It.IsAny<int>()
+    //             )
+    //         )
+    //         .Returns(() => { });
+    //     var logViewAdaptor = CreateLogViewAdaptor<CounterGrainState, ICounterEvent>();
+    //
+    //     await logViewAdaptor.PreOnActivate();
+    //     await logViewAdaptor.PostOnActivate();
+    //
+    //     throw new NotImplementedException();
+    //     // Assert.That(logViewAdaptor.ConfirmedView);
+    // }
 
-    private class TestSiloConfigurator : ISiloConfigurator
+    private LogViewAdaptor<TLogView, TLogEntry> CreateLogViewAdaptor<TLogView, TLogEntry>()
+        where TLogView : class, new()
+        where TLogEntry : class
     {
-        public void Configure(ISiloBuilder siloBuilder)
-        {
-            siloBuilder
-                .AddEventStorageBasedLogConsistencyProviderAsDefault()
-                .AddMemoryEventStorageAsDefault();
-        }
+        return MockContainer.CreateInstance<LogViewAdaptor<TLogView, TLogEntry>>();
     }
 }

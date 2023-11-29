@@ -10,6 +10,9 @@
         <DebugType>embedded</DebugType>
         <DebugSymbols>true</DebugSymbols>
         <TargetFramework>net8.0</TargetFramework>
+        <Configurations>Debug;Release;Testing</Configurations>
+        <Platforms>AnyCPU</Platforms>
+        <OrleansBuildTimeCodeGen>true</OrleansBuildTimeCodeGen>
     </PropertyGroup>
 
     <ItemGroup>
@@ -20,21 +23,23 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0"/>
         <PackageReference Include="Microsoft.Orleans.EventSourcing" Version="7.2.3"/>
+        <PackageReference Include="Microsoft.Orleans.Sdk" Version="7.2.3"/>
+        <PackageReference Include="System.Linq.Async" Version="6.0.1"/>
     </ItemGroup>
 
     <!-- Testing Specific configuiration goes here -->
-    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <PropertyGroup Condition="'$(Configuration)' == 'Testing'">
         <IsTestProject>true</IsTestProject>
     </PropertyGroup>
 
     <!-- Testing Specific files go here -->
-    <ItemGroup Condition="'$(Configuration)' == 'Release'">
+    <ItemGroup Condition="'$(Configuration)' != 'Testing'">
         <Compile Remove="**\*.Tests.cs"/>
         <Compile Remove="**\Testing\*"/>
     </ItemGroup>
 
     <!-- Testing Specific Dependencies go here -->
-    <ItemGroup Condition="'$(Configuration)' != 'Release'">
+    <ItemGroup Condition="'$(Configuration)' == 'Testing'">
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2"/>
         <PackageReference Include="Microsoft.Orleans.TestingHost" Version="7.2.3"/>
         <PackageReference Include="NUnit" Version="3.13.3"/>

@@ -8,23 +8,37 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{18A1
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orleans.EventSourcing.EventStorage.EventStore", "src\Orleans.EventSourcing.EventStorage.EventStore\Orleans.EventSourcing.EventStorage.EventStore.csproj", "{6212E8FA-0132-445F-8922-3F2B90FFEE46}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Counter", "samples\Counter\Counter.csproj", "{32984699-1F15-4ECF-BD1F-83E89A40796E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+		Testing|Any CPU = Testing|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{D44E30A2-8717-42F0-841C-B17F53739ACB} = {B2E94C00-7746-49D0-89E1-033613798D07}
 		{6212E8FA-0132-445F-8922-3F2B90FFEE46} = {B2E94C00-7746-49D0-89E1-033613798D07}
+		{32984699-1F15-4ECF-BD1F-83E89A40796E} = {18A1DDF5-1352-4D4E-A08D-DAF3F9AD5F84}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{D44E30A2-8717-42F0-841C-B17F53739ACB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D44E30A2-8717-42F0-841C-B17F53739ACB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D44E30A2-8717-42F0-841C-B17F53739ACB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D44E30A2-8717-42F0-841C-B17F53739ACB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D44E30A2-8717-42F0-841C-B17F53739ACB}.Testing|Any CPU.ActiveCfg = Testing|Any CPU
+		{D44E30A2-8717-42F0-841C-B17F53739ACB}.Testing|Any CPU.Build.0 = Testing|Any CPU
 		{6212E8FA-0132-445F-8922-3F2B90FFEE46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6212E8FA-0132-445F-8922-3F2B90FFEE46}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6212E8FA-0132-445F-8922-3F2B90FFEE46}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6212E8FA-0132-445F-8922-3F2B90FFEE46}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6212E8FA-0132-445F-8922-3F2B90FFEE46}.Testing|Any CPU.ActiveCfg = Testing|Any CPU
+		{6212E8FA-0132-445F-8922-3F2B90FFEE46}.Testing|Any CPU.Build.0 = Testing|Any CPU
+		{32984699-1F15-4ECF-BD1F-83E89A40796E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{32984699-1F15-4ECF-BD1F-83E89A40796E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{32984699-1F15-4ECF-BD1F-83E89A40796E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{32984699-1F15-4ECF-BD1F-83E89A40796E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{32984699-1F15-4ECF-BD1F-83E89A40796E}.Testing|Any CPU.ActiveCfg = Testing|Any CPU
+		{32984699-1F15-4ECF-BD1F-83E89A40796E}.Testing|Any CPU.Build.0 = Testing|Any CPU
 	EndGlobalSection
 EndGlobal

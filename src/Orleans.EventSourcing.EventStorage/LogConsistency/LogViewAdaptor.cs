@@ -185,7 +185,7 @@ internal class LogViewAdaptor<TLogView, TLogEntry> :
     }
 
 #if DEBUG
-    private bool _operationInProgress;
+    private readonly Dictionary<string, bool> _operationInProgress = new();
 #endif
 
     [Conditional("DEBUG")]
@@ -193,8 +193,8 @@ internal class LogViewAdaptor<TLogView, TLogEntry> :
     {
 #if DEBUG
         Services.Log(LogLevel.Trace, "/-- enter {0}", name);
-        Debug.Assert(!_operationInProgress);
-        _operationInProgress = true;
+        Debug.Assert(!_operationInProgress.GetValueOrDefault(name));
+        _operationInProgress[name] = true;
 #endif
     }
 
@@ -203,8 +203,8 @@ internal class LogViewAdaptor<TLogView, TLogEntry> :
     {
 #if DEBUG
         Services.Log(LogLevel.Trace, "\\-- exit {0}", name);
-        Debug.Assert(_operationInProgress);
-        _operationInProgress = false;
+        Debug.Assert(_operationInProgress.GetValueOrDefault(name));
+        _operationInProgress[name] = false;
 #endif
     }
 
