@@ -21,10 +21,10 @@ jobs:
       run: dotnet restore
       
     - name: Build (Test)
-      run: dotnet build --no-restore
+      run: dotnet build -c Testing --no-restore
       
     - name: Build (Release)
       run: dotnet build -c Release --no-restore
       
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test -c Testing --no-build --verbosity normal
