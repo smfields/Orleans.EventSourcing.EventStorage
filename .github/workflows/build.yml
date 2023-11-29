@@ -17,14 +17,11 @@ jobs:
       with:
         dotnet-version: 8.0.x
         
-    - name: Restore dependencies
-      run: dotnet restore
-      
     - name: Build (Test)
-      run: dotnet build -c Testing --no-restore
+      run: dotnet build -c Testing
       
     - name: Build (Release)
-      run: dotnet build -c Release --no-restore
+      run: dotnet build -c Release
       
     - name: Test
       run: dotnet test -c Testing --no-build --verbosity normal
