@@ -10,30 +10,26 @@ on:
 
 env:
   DOTNET_NOLOGO: true
-  Configuration: Release
 
 defaults:
   run:
     shell: bash
 
 jobs:
+  build:
+    uses: ./.github/workflows/build.yml
+
   publish:
     runs-on: ubuntu-latest
     steps:
-      - name: 🤘 checkout
+      - name: Checkout
         uses: actions/checkout@v2
         with: 
           submodules: recursive
           fetch-depth: 0
 
-      - name: 🙏 build
-        run: dotnet build -p:version=${GITHUB_REF#refs/*/v}
+      - name: Pack
+        run: dotnet pack -c Release --output . -p:version=${GITHUB_REF#refs/*/v}
 
-      - name: 🧪 test
-        run: dotnet test --no-build --verbosity normal
-
-      - name: 📦 pack
-        run: dotnet pack --output . -p:version=${GITHUB_REF#refs/*/v}
-
-      - name: 🚀 nuget
+      - name: Publish Nuget Package
         run: dotnet nuget push "*.nupkg" -s https://api.nuget.org/v3/index.json -k ${{secrets.NUGET_API_KEY}} --skip-duplicate
