@@ -11,13 +11,12 @@ public interface IMemoryEventStorageGrain : IGrainWithIntegerKey
     /// <param name="grainId">ID of the grain to which the events belong</param>
     /// <param name="version">The version to start reading from</param>
     /// <param name="maxCount">The number of events to read</param>
-    /// <typeparam name="TEvent">The grain event type</typeparam>
     /// <returns><see cref="IAsyncEnumerable{T}"/> containing the requested events</returns>
-    IAsyncEnumerable<EventRecord<TEvent>> ReadEventsFromStorage<TEvent>(
+    IAsyncEnumerable<EventRecord<ReadOnlyMemory<byte>>> ReadEventsFromStorage(
         GrainId grainId,
         int version = 0,
         int maxCount = 2147483647
-    ) where TEvent : class;
+    );
 
     /// <summary>
     /// Append events to an event stream.
@@ -25,19 +24,18 @@ public interface IMemoryEventStorageGrain : IGrainWithIntegerKey
     /// <param name="grainId">ID of the grain to which the events belong</param>
     /// <param name="events">Enumerable of events to append to the stream</param>
     /// <param name="expectedVersion">The expected current version of the stream</param>
-    /// <typeparam name="TEvent">The grain event type</typeparam>
     /// <returns>Completion promise that returns true if the events were appended successfully, or false otherwise</returns>
-    Task<bool> AppendEventsToStorage<TEvent>(
+    Task<bool> AppendEventsToStorage(
         GrainId grainId,
-        IEnumerable<TEvent> events,
+        IEnumerable<ReadOnlyMemory<byte>> events,
         int expectedVersion
-    ) where TEvent : class;
+    );
 }
 
 internal class MemoryEventStorageGrain : IMemoryEventStorageGrain
 {
     private readonly ILogger<MemoryEventStorageGrain> _logger;
-    private readonly Dictionary<GrainId, dynamic> _store = new();
+    private readonly Dictionary<GrainId, List<ReadOnlyMemory<byte>>> _store = new();
 
     public MemoryEventStorageGrain(ILogger<MemoryEventStorageGrain> logger)
     {
@@ -45,12 +43,12 @@ internal class MemoryEventStorageGrain : IMemoryEventStorageGrain
     }
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-    public async IAsyncEnumerable<EventRecord<TEvent>> ReadEventsFromStorage<TEvent>(
+    public async IAsyncEnumerable<EventRecord<ReadOnlyMemory<byte>>> ReadEventsFromStorage(
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         GrainId grainId,
         int version = 0,
         int maxCount = 2147483647
-    ) where TEvent : class
+    )
     {
         if (_logger.IsEnabled(LogLevel.Debug))
         {
@@ -59,19 +57,22 @@ internal class MemoryEventStorageGrain : IMemoryEventStorageGrain
 
         var exists = _store.TryGetValue(grainId, out var entries);
 
-        if (!exists || entries is not List<TEvent> events)
+        if (!exists || entries is null)
         {
             yield break;
         }
 
-        for (var i = 0; i < events.Count; i++)
+        for (var i = 0; i < entries.Count; i++)
         {
-            yield return new EventRecord<TEvent>(events[i], i);
+            yield return new EventRecord<ReadOnlyMemory<byte>>(entries[i], i);
         }
     }
 
-    public Task<bool> AppendEventsToStorage<TEvent>(GrainId grainId, IEnumerable<TEvent> events, int expectedVersion)
-        where TEvent : class
+    public Task<bool> AppendEventsToStorage(
+        GrainId grainId,
+        IEnumerable<ReadOnlyMemory<byte>> events,
+        int expectedVersion
+    )
     {
         if (_logger.IsEnabled(LogLevel.Debug))
         {
@@ -84,7 +85,7 @@ internal class MemoryEventStorageGrain : IMemoryEventStorageGrain
 
         if (!_store.TryGetValue(grainId, out var entries))
         {
-            entries = new List<TEvent>();
+            entries = new List<ReadOnlyMemory<byte>>();
             _store[grainId] = entries;
         }
 

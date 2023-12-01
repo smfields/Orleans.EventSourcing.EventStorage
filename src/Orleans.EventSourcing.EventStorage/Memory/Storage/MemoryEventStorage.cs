@@ -23,18 +23,21 @@ public class MemoryEventStorage : IEventStorage
     private readonly string _name;
     private readonly MemoryEventStorageOptions _options;
     private readonly ILogger<MemoryEventStorage> _logger;
+    private readonly IGrainStorageSerializer _storageSerializer;
 
     public MemoryEventStorage(
         string name,
         MemoryEventStorageOptions options,
         ILogger<MemoryEventStorage> logger,
-        IGrainFactory grainFactory
+        IGrainFactory grainFactory,
+        IGrainStorageSerializer defaultGrainStorageSerializer
     )
     {
         _name = name;
         _options = options;
         _logger = logger;
         _storageGrains = InitializeGrainReferences(grainFactory);
+        _storageSerializer = options.GrainStorageSerializer ?? defaultGrainStorageSerializer;
     }
 
     private Lazy<IMemoryEventStorageGrain>[] InitializeGrainReferences(IGrainFactory grainFactory)
@@ -57,7 +60,7 @@ public class MemoryEventStorage : IEventStorage
         return storageGrains;
     }
 
-    public IAsyncEnumerable<EventRecord<TEvent>> ReadEventsFromStorage<TEvent>(
+    public async IAsyncEnumerable<EventRecord<TEvent>> ReadEventsFromStorage<TEvent>(
         GrainId grainId,
         int version = 0,
         int maxCount = 2147483647
@@ -65,7 +68,13 @@ public class MemoryEventStorage : IEventStorage
     {
         if (_logger.IsEnabled(LogLevel.Trace)) _logger.LogTrace("Read Key={Key}", grainId);
         var storageGrain = GetStorageGrain(grainId);
-        return storageGrain.ReadEventsFromStorage<TEvent>(grainId, version, maxCount);
+        var storedEvents = storageGrain.ReadEventsFromStorage(grainId, version, maxCount);
+
+        await foreach (var entry in storedEvents)
+        {
+            var eventData = ConvertFromStorageFormat<TEvent>(entry.Data);
+            yield return new EventRecord<TEvent>(eventData, entry.Version);
+        }
     }
 
     public Task<bool> AppendEventsToStorage<TEvent>(
@@ -76,13 +85,56 @@ public class MemoryEventStorage : IEventStorage
         where TEvent : class
     {
         if (_logger.IsEnabled(LogLevel.Trace)) _logger.LogTrace("Append Key={Key}", grainId);
+
         var storageGrain = GetStorageGrain(grainId);
-        return storageGrain.AppendEventsToStorage(grainId, events, expectedVersion);
+        return storageGrain.AppendEventsToStorage(
+            grainId,
+            events.Select(ConvertToStorageFormat).ToList(),
+            expectedVersion
+        );
     }
 
     private IMemoryEventStorageGrain GetStorageGrain(GrainId id)
     {
         var idx = (uint)id.GetHashCode() % (uint)_storageGrains.Length;
         return _storageGrains[idx].Value;
+    }
+
+    /// <summary>
+    /// Deserialize from binary data
+    /// </summary>
+    /// <param name="data">The serialized stored data</param>
+    private T ConvertFromStorageFormat<T>(ReadOnlyMemory<byte> data)
+    {
+        try
+        {
+            return _storageSerializer.Deserialize<T>(data);
+        }
+        catch (Exception exc)
+        {
+            var sb = new StringBuilder();
+            if (data.ToArray().Length > 0)
+            {
+                sb.Append($"Unable to convert from storage format GrainStateEntity.Data={data}");
+            }
+
+            _logger.LogError(exc, "{Message}", sb.ToString());
+            throw new AggregateException(sb.ToString(), exc);
+        }
+    }
+
+    /// <summary>
+    /// Serialize to the storage format.
+    /// </summary>
+    /// <param name="grainEvent">The grain event data to be serialized</param>
+    /// <remarks>
+    /// See:
+    /// http://msdn.microsoft.com/en-us/library/system.web.script.serialization.javascriptserializer.aspx
+    /// for more on the JSON serializer.
+    /// </remarks>
+    private ReadOnlyMemory<byte> ConvertToStorageFormat<T>(T grainEvent)
+    {
+        // Convert to binary format
+        return _storageSerializer.Serialize(grainEvent);
     }
 }
