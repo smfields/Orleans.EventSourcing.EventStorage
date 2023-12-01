@@ -24,6 +24,11 @@
         <PackageReference Include="System.Linq.Async" Version="6.0.1"/>
     </ItemGroup>
 
+    <!-- Testing Specific configuiration goes here -->
+    <PropertyGroup Condition="'$(Configuration)' != 'Release'">
+        <IsTestProject>true</IsTestProject>
+    </PropertyGroup>
+
     <!-- Testing Specific files go here -->
     <ItemGroup Condition="'$(Configuration)' == 'Release'">
         <Compile Remove="**\*.Tests.cs"/>
@@ -32,7 +37,7 @@
 
     <!-- Testing Specific Dependencies go here -->
     <ItemGroup Condition="'$(Configuration)' != 'Release'">
-        <!--        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2"/>-->
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2"/>
         <PackageReference Include="Microsoft.Orleans.TestingHost" Version="7.2.3"/>
         <PackageReference Include="NUnit" Version="3.13.3"/>
         <PackageReference Include="NUnit3TestAdapter" Version="4.2.1"/>
