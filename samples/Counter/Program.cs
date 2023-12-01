@@ -1,19 +1,13 @@
 using Counter;
-using Orleans.EventSourcing.EventStorage.Memory;
 
 // Configure the host
 using var host = new HostBuilder()
     .UseOrleans(builder =>
     {
-        builder.UseLocalhostClustering();
-
-        // Log Storage Provider
-        // builder.AddLogStorageBasedLogConsistencyProviderAsDefault();
-        // builder.AddMemoryGrainStorageAsDefault();
-
-        // Event Storage Provider
-        builder.AddEventStorageBasedLogConsistencyProviderAsDefault();
-        builder.AddMemoryEventStorageAsDefault();
+        builder
+            .UseLocalhostClustering()
+            .AddEventStorageBasedLogConsistencyProviderAsDefault()
+            .AddMemoryEventStorageAsDefault();
     })
     .Build();
 
@@ -22,8 +16,6 @@ await host.StartAsync();
 
 // Get the grain factory
 var grainFactory = host.Services.GetRequiredService<IGrainFactory>();
-
-var memory = grainFactory.GetGrain<IMemoryEventStorageGrain>(0);
 
 // Get a reference to the counter grain
 var counter = grainFactory.GetGrain<ICounterGrain>(0);
@@ -41,8 +33,7 @@ await counter.Increment(15);
 var updatedValue = await counter.GetCurrentValue();
 Console.WriteLine($"Updated Value: {updatedValue}");
 
-Console.WriteLine("Orleans is running.\nPress Enter to terminate...");
-Console.ReadLine();
-Console.WriteLine("Orleans is stopping...");
+Console.WriteLine("Orleans is running.");
+Console.WriteLine("Press Enter to terminate...");
 
 await host.StopAsync();
