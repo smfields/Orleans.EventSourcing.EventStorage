@@ -1,4 +1,6 @@
-﻿using Orleans.EventSourcing.EventStorage.Testing.TestGrains;
+﻿using NUnit.Framework.Internal.Execution;
+using Orleans.EventSourcing.EventStorage.Testing.TestGrains;
+using Orleans.Runtime;
 
 namespace Orleans.EventSourcing.EventStorage;
 
@@ -27,31 +29,64 @@ public class LogViewAdaptorTests
         Assert.That(logViewAdaptor.ConfirmedVersion, Is.EqualTo(0));
     }
 
-    // [Test]
-    // public async Task OnActivate_initializes_the_confirmed_view()
-    // {
-    //     var initialEvents = new List<EventRecord<ICounterEvent>>
-    //     {
-    //         new(new CounterResetEvent(10), 1)
-    //     };
-    //     MockContainer
-    //         .GetMock<IEventStorage>()
-    //         .Setup(
-    //             x => x.ReadEventsFromStorage<ICounterEvent>(
-    //                 It.IsAny<GrainId>(),
-    //                 It.IsAny<int>(),
-    //                 It.IsAny<int>()
-    //             )
-    //         )
-    //         .Returns(() => { });
-    //     var logViewAdaptor = CreateLogViewAdaptor<CounterGrainState, ICounterEvent>();
-    //
-    //     await logViewAdaptor.PreOnActivate();
-    //     await logViewAdaptor.PostOnActivate();
-    //
-    //     throw new NotImplementedException();
-    //     // Assert.That(logViewAdaptor.ConfirmedView);
-    // }
+    [Test]
+    public async Task OnActivate_updates_the_confirmed_version()
+    {
+        var initialEvents = new List<EventRecord<ICounterEvent>>
+        {
+            new(new CounterResetEvent(1001), 1),
+            new(new CounterIncrementedEvent(10), 2)
+        };
+        MockContainer
+            .GetMock<IEventStorage>()
+            .Setup(
+                x => x.ReadEventsFromStorage<ICounterEvent>(
+                    It.IsAny<GrainId>(),
+                    It.IsAny<int>(),
+                    It.IsAny<int>()
+                )
+            )
+            .Returns(() => initialEvents.ToAsyncEnumerable());
+        var logViewAdaptor = CreateLogViewAdaptor<CounterGrainState, ICounterEvent>();
+
+        await logViewAdaptor.PreOnActivate();
+        await logViewAdaptor.PostOnActivate();
+        await logViewAdaptor.Synchronize();
+
+        Assert.That(logViewAdaptor.ConfirmedVersion, Is.EqualTo(2));
+    }
+
+    [Test]
+    public async Task OnActivate_applies_stored_events_to_the_grain()
+    {
+        var initialEvents = new List<EventRecord<ICounterEvent>>
+        {
+            new(new CounterResetEvent(1001), 1),
+            new(new CounterIncrementedEvent(10), 2)
+        };
+        MockContainer
+            .GetMock<IEventStorage>()
+            .Setup(
+                x => x.ReadEventsFromStorage<ICounterEvent>(
+                    It.IsAny<GrainId>(),
+                    It.IsAny<int>(),
+                    It.IsAny<int>()
+                )
+            )
+            .Returns(() => initialEvents.ToAsyncEnumerable());
+
+        var logViewAdaptor = CreateLogViewAdaptor<CounterGrainState, ICounterEvent>();
+
+        await logViewAdaptor.PreOnActivate();
+        await logViewAdaptor.PostOnActivate();
+        await logViewAdaptor.Synchronize();
+
+        var hostGrainMock = MockContainer.GetMock<ILogViewAdaptorHost<CounterGrainState, ICounterEvent>>();
+        foreach (var @event in initialEvents)
+        {
+            hostGrainMock.Verify(x => x.UpdateView(It.IsAny<CounterGrainState>(), @event.Data), Times.Once);
+        }
+    }
 
     private LogViewAdaptor<TLogView, TLogEntry> CreateLogViewAdaptor<TLogView, TLogEntry>()
         where TLogView : class, new()
