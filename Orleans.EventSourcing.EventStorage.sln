@@ -12,7 +12,6 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-		Testing|Any CPU = Testing|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{D44E30A2-8717-42F0-841C-B17F53739ACB} = {B2E94C00-7746-49D0-89E1-033613798D07}
@@ -23,13 +22,9 @@ Global
 		{D44E30A2-8717-42F0-841C-B17F53739ACB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D44E30A2-8717-42F0-841C-B17F53739ACB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D44E30A2-8717-42F0-841C-B17F53739ACB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D44E30A2-8717-42F0-841C-B17F53739ACB}.Testing|Any CPU.ActiveCfg = Testing|Any CPU
-		{D44E30A2-8717-42F0-841C-B17F53739ACB}.Testing|Any CPU.Build.0 = Testing|Any CPU
 		{32984699-1F15-4ECF-BD1F-83E89A40796E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{32984699-1F15-4ECF-BD1F-83E89A40796E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{32984699-1F15-4ECF-BD1F-83E89A40796E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{32984699-1F15-4ECF-BD1F-83E89A40796E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{32984699-1F15-4ECF-BD1F-83E89A40796E}.Testing|Any CPU.ActiveCfg = Testing|Any CPU
-		{32984699-1F15-4ECF-BD1F-83E89A40796E}.Testing|Any CPU.Build.0 = Testing|Any CPU
 	EndGlobalSection
 EndGlobal
