@@ -153,6 +153,17 @@ internal class LogViewAdaptor<TLogView, TLogEntry> :
         return writeSuccessful ? updateEntries.Count : 0;
     }
 
+    /// <inheritdoc />
+    public override async Task<IReadOnlyList<TLogEntry>> RetrieveLogSegment(int fromVersion, int length)
+    {
+        var events = await _eventStorage
+            .ReadEventsFromStorage<TLogEntry>(Services.GrainId, fromVersion, length)
+            .Select(x => x.Data)
+            .ToListAsync();
+
+        return events.AsReadOnly();
+    }
+
     /// <summary>
     /// Applies a single event to the local cached view
     /// </summary>
