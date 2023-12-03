@@ -43,7 +43,7 @@ internal class MemoryEventStorageGrain : IMemoryEventStorageGrain
     }
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-    public async IAsyncEnumerable<EventRecord<ReadOnlyMemory<byte>>> ReadEventsFromStorage(
+    public IAsyncEnumerable<EventRecord<ReadOnlyMemory<byte>>> ReadEventsFromStorage(
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         GrainId grainId,
         int version = 0,
@@ -56,16 +56,23 @@ internal class MemoryEventStorageGrain : IMemoryEventStorageGrain
         }
 
         var exists = _store.TryGetValue(grainId, out var entries);
-
         if (!exists || entries is null)
         {
-            yield break;
+            return Array.Empty<EventRecord<ReadOnlyMemory<byte>>>().ToAsyncEnumerable();
         }
 
-        for (var i = 0; i < entries.Count; i++)
+        var numEventsToRead = Math.Max(0, Math.Min(entries.Count - version, maxCount));
+        if (numEventsToRead == 0)
         {
-            yield return new EventRecord<ReadOnlyMemory<byte>>(entries[i], i);
+            return Array.Empty<EventRecord<ReadOnlyMemory<byte>>>().ToAsyncEnumerable();
         }
+
+        return entries
+            .GetRange(version, numEventsToRead)
+            .Select((eventData, eventVersion) =>
+                new EventRecord<ReadOnlyMemory<byte>>(eventData, eventVersion)
+            )
+            .ToAsyncEnumerable();
     }
 
     public Task<bool> AppendEventsToStorage(
