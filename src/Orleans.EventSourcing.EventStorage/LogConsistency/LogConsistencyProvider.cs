@@ -1,4 +1,5 @@
-﻿using Orleans.Storage;
+﻿using Orleans.EventSourcing.EventStorage.Snapshots;
+using Orleans.Storage;
 
 namespace Orleans.EventSourcing.EventStorage;
 
@@ -28,6 +29,7 @@ public class LogConsistencyProvider : ILogViewAdaptorFactory
         where TEntry : class
     {
         var eventStorage = EventStorageHelpers.GetEventStorage(hostGrain.GetType(), _serviceProvider);
-        return new LogViewAdaptor<TView, TEntry>(hostGrain, initialstate, services, eventStorage);
+        var snapshotStrategy = SnapshotStrategyHelpers.GetSnapshotStrategy(hostGrain.GetType(), _serviceProvider);
+        return new LogViewAdaptor<TView, TEntry>(hostGrain, initialstate, services, snapshotStrategy, eventStorage);
     }
 }

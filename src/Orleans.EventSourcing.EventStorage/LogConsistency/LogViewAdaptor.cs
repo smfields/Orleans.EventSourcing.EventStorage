@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Orleans.EventSourcing.Common;
+using Orleans.EventSourcing.EventStorage.Snapshots;
 
 namespace Orleans.EventSourcing.EventStorage;
 
@@ -14,6 +15,7 @@ internal class LogViewAdaptor<TLogView, TLogEntry> :
     where TLogView : class, new()
     where TLogEntry : class
 {
+    private readonly ISnapshotStrategy _snapshotStrategy;
     private readonly IEventStorage _eventStorage;
     private TLogView _cached = default!;
     private int _version;
@@ -22,10 +24,12 @@ internal class LogViewAdaptor<TLogView, TLogEntry> :
         ILogViewAdaptorHost<TLogView, TLogEntry> host,
         TLogView initialState,
         ILogConsistencyProtocolServices services,
+        ISnapshotStrategy snapshotStrategy,
         IEventStorage eventStorage
     )
         : base(host, initialState, services)
     {
+        _snapshotStrategy = snapshotStrategy;
         _eventStorage = eventStorage;
     }
 
@@ -62,8 +66,15 @@ internal class LogViewAdaptor<TLogView, TLogEntry> :
 
             try
             {
-                // Read all events from the beginning of the event stream for this grain
-                var entries = _eventStorage.ReadEventsFromStorage<TLogEntry>(Services.GrainId);
+                // Load the latest snapshot.
+                // If there is no snapshot then we'll start with the default object and the version will be 0.
+                await TryLoadFromSnapshot();
+
+                // Read all events from the latest snapshot to the end of the stream for this grain
+                var entries = _eventStorage.ReadEventsFromStorage<TLogEntry>(
+                    Services.GrainId,
+                    _version
+                );
 
                 // Apply all events in order
                 var transitionSuccessful = true;
@@ -128,6 +139,12 @@ internal class LogViewAdaptor<TLogView, TLogEntry> :
             LastPrimaryIssue.Record(new UpdatePrimaryFailed { Exception = ex }, Host, Services);
         }
 
+        // Notify snapshot strategy of all appended events in case it wants to create a new snapshot
+        foreach (var (logEntry, version) in updateEntries.Select((entry, i) => (entry, _version + 1 + i)))
+        {
+            await _snapshotStrategy.OnEventAppended(Services.GrainId, logEntry, version);
+        }
+
         // Now that the events have been written to the event stream we can apply them locally
         if (writeSuccessful)
         {
@@ -185,6 +202,13 @@ internal class LogViewAdaptor<TLogView, TLogEntry> :
         }
 
         return false;
+    }
+
+    private async Task TryLoadFromSnapshot()
+    {
+        var snapshot = await _snapshotStrategy.Reader.ReadLatestSnapshot<TLogView>(Services.GrainId);
+        _cached = snapshot.State;
+        _version = snapshot.Version;
     }
 
     private static Exception UnwrapTransportException(Exception exception)
