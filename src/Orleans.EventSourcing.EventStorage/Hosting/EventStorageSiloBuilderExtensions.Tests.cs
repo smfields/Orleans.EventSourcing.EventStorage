@@ -33,7 +33,7 @@ public class EventStorageSiloBuilderExtensionsTests
         Assert.That(provider, Is.TypeOf<LogConsistencyProvider>());
 
         // Retrieve default (keyed) service
-        provider = silo.SiloHost.Services.GetRequiredServiceByName<ILogViewAdaptorFactory>(
+        provider = silo.SiloHost.Services.GetKeyedService<ILogViewAdaptorFactory>(
             ProviderConstants.DEFAULT_LOG_CONSISTENCY_PROVIDER_NAME
         );
         Assert.That(provider, Is.TypeOf<LogConsistencyProvider>());
@@ -43,7 +43,7 @@ public class EventStorageSiloBuilderExtensionsTests
     public void EventStorage_provider_can_be_registered_by_name()
     {
         var silo = Cluster.Primary as InProcessSiloHandle;
-        var provider = silo!.SiloHost.Services.GetRequiredServiceByName<ILogViewAdaptorFactory>("EventStorage");
+        var provider = silo!.SiloHost.Services.GetRequiredKeyedService<ILogViewAdaptorFactory>("EventStorage");
         Assert.That(provider, Is.TypeOf<LogConsistencyProvider>());
     }
 

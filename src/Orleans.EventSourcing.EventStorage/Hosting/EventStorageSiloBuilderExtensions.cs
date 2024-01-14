@@ -34,11 +34,10 @@ public static class EventStorageSiloBuilderExtensions
     {
         services.AddProtocolServices();
         services.TryAddSingleton<ILogViewAdaptorFactory>(sp =>
-            sp.GetServiceByName<ILogViewAdaptorFactory>(ProviderConstants.DEFAULT_LOG_CONSISTENCY_PROVIDER_NAME)
+            sp.GetRequiredKeyedService<ILogViewAdaptorFactory>(ProviderConstants.DEFAULT_LOG_CONSISTENCY_PROVIDER_NAME)
         );
         return services
-            .AddKeyedSingleton<ILogViewAdaptorFactory, LogConsistencyProvider>(name) // .NET 8 Built-in keyed services
-            .AddSingletonNamedService<ILogViewAdaptorFactory, LogConsistencyProvider>(name); // Orleans keyed services
+            .AddKeyedSingleton<ILogViewAdaptorFactory, LogConsistencyProvider>(name);
     }
 
     private static void AddProtocolServices(this IServiceCollection services)
